@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#10141a"/>
+  <circle cx="154" cy="142" r="82" fill="#6001d1" opacity=".8"/>
+  <circle cx="354" cy="356" r="104" fill="#5b5eff" opacity=".75"/>
+  <path d="M164 142h184c28 0 50 22 50 50v128c0 28-22 50-50 50H164c-28 0-50-22-50-50V192c0-28 22-50 50-50Z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.25)" stroke-width="10"/>
+  <path d="m236 208 92 48-92 48v-96Z" fill="#fefaff"/>
+  <text x="256" y="430" text-anchor="middle" fill="#dfe2eb" font-size="58" font-family="Inter, Arial, sans-serif" font-weight="800">VIBE</text>
+</svg>
