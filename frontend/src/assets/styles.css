@@ -79,6 +79,7 @@ img {
   white-space: nowrap;
   word-wrap: normal;
   font-feature-settings: "liga";
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
 .app-button {
@@ -104,9 +105,9 @@ img {
 
 .app-button.primary {
   background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
+  box-shadow: 0 14px 36px rgba(91, 94, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: #fefaff;
   font-weight: 800;
-  box-shadow: 0 14px 36px rgba(91, 94, 255, 0.28);
 }
 
 .app-button.ghost {
@@ -114,11 +115,23 @@ img {
   color: var(--on-surface);
 }
 
+.app-button.primary:hover {
+  box-shadow: 0 18px 44px rgba(91, 94, 255, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
 .glass {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+}
+
+.glass-elevated {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(91, 94, 255, 0.08);
 }
 
 .screen {
@@ -156,18 +169,39 @@ img {
 .input-wrap {
   align-items: center;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid transparent;
+  background-clip: padding-box;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   display: flex;
   gap: 10px;
   padding: 0 14px;
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  position: relative;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.input-wrap::after {
+  border-radius: inherit;
+  content: '';
+  inset: 0;
+  opacity: 0;
+  padding: 1px;
+  pointer-events: none;
+  position: absolute;
+  background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  transition: opacity 180ms ease;
 }
 
 .input-wrap:focus-within {
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(192, 193, 255, 0.72);
   box-shadow: 0 8px 28px rgba(91, 94, 255, 0.18);
+}
+
+.input-wrap:focus-within::after {
+  opacity: 1;
 }
 
 .input-wrap input {
@@ -189,6 +223,27 @@ img {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+@keyframes nav-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(91, 94, 255, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(91, 94, 255, 0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .video-card,
+  .glass {
+    transition: transform 220ms ease, box-shadow 220ms ease;
+  }
+
+  .video-card:hover {
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.42);
+    transform: translateY(-2px) scale(1.01);
+  }
 }
 
 @media (min-width: 800px) {

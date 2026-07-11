@@ -1,8 +1,15 @@
 <script setup>
+import { useRouter } from 'vue-router';
 import BrandLogo from '../common/BrandLogo.vue';
 import { useAuthStore } from '../../store/auth';
 
 const authStore = useAuthStore();
+const router = useRouter();
+
+function handleLogout() {
+  authStore.logout();
+  router.push({ name: 'welcome' });
+}
 </script>
 
 <template>
@@ -13,9 +20,14 @@ const authStore = useAuthStore();
       <RouterLink to="/search">Search</RouterLink>
       <RouterLink v-if="authStore.isAuthenticated" to="/dashboard">Dashboard</RouterLink>
     </nav>
-    <RouterLink v-if="authStore.isAuthenticated" class="top-bar__avatar" to="/profile" aria-label="Profile">
-      {{ authStore.user?.name?.charAt(0) || 'V' }}
-    </RouterLink>
+    <div v-if="authStore.isAuthenticated" class="top-bar__account">
+      <RouterLink class="top-bar__avatar" to="/profile" aria-label="Profile">
+        {{ authStore.user?.name?.charAt(0) || 'V' }}
+      </RouterLink>
+      <button type="button" class="top-bar__logout" aria-label="Log out" title="Log out" @click="handleLogout">
+        <span class="material-symbols-outlined">logout</span>
+      </button>
+    </div>
     <RouterLink v-else class="app-button ghost" to="/login">Login</RouterLink>
   </header>
 </template>
@@ -50,6 +62,12 @@ const authStore = useAuthStore();
   color: var(--on-surface);
 }
 
+.top-bar__account {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .top-bar__avatar {
   align-items: center;
   background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
@@ -59,6 +77,25 @@ const authStore = useAuthStore();
   height: 40px;
   justify-content: center;
   width: 40px;
+}
+
+.top-bar__logout {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: var(--on-surface-muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: 40px;
+  justify-content: center;
+  transition: color 160ms ease, border-color 160ms ease;
+  width: 40px;
+}
+
+.top-bar__logout:hover {
+  border-color: var(--error);
+  color: var(--error);
 }
 
 @media (min-width: 720px) {
