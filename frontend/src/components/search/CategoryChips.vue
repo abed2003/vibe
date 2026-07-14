@@ -31,7 +31,7 @@ defineEmits(['update:active']);
 <style scoped>
 .chips {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: none;
@@ -42,19 +42,21 @@ defineEmits(['update:active']);
 }
 
 .chips__item {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
+  background: var(--surface-container);
+  border: 1px solid var(--outline-soft);
+  border-radius: var(--radius-full);
   color: var(--on-surface-muted);
   cursor: pointer;
   flex: 0 0 auto;
-  font-weight: 800;
+  font-weight: var(--weight-black);
   min-height: 38px;
-  padding: 0 14px;
+  padding: 0 var(--space-4);
+  transition: background var(--duration-base) var(--ease-standard), color var(--duration-base) var(--ease-standard), border-color var(--duration-base) var(--ease-standard);
 }
 
 .chips__item--active {
   background: var(--primary-strong);
-  color: #fefaff;
+  border-color: var(--primary-strong);
+  color: var(--on-vivid);
 }
 </style>

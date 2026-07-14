@@ -42,9 +42,9 @@
 
 .welcome-view__content {
   display: grid;
-  gap: 18px;
+  gap: var(--space-4);
   max-width: 520px;
-  padding: 32px 18px 58px;
+  padding: var(--space-7) var(--space-4) 58px;
   position: relative;
   text-align: center;
   z-index: 1;
@@ -57,13 +57,14 @@
 }
 
 .welcome-view p {
-  color: var(--on-surface-muted);
-  font-size: 18px;
+  color: var(--on-vivid);
+  font-size: var(--text-md);
   margin: 0;
+  opacity: 0.82;
 }
 
 .welcome-view__actions {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
 }
 </style>

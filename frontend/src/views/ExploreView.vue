@@ -29,12 +29,13 @@ const activeCategory = ref('For You');
 <style scoped>
 .explore-view {
   display: grid;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .explore-view h1 {
-  font-size: 34px;
-  margin: 0 0 8px;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  margin: 0 0 var(--space-2);
 }
 
 .explore-view p {
@@ -43,7 +44,7 @@ const activeCategory = ref('For You');
 
 .video-grid {
   display: grid;
-  gap: 14px;
+  gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 </style>

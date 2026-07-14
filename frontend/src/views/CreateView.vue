@@ -64,7 +64,7 @@ function createDraft(payload) {
 <style scoped>
 .create-view {
   display: grid;
-  gap: 18px;
+  gap: var(--space-4);
   margin: 0 auto;
   max-width: 760px;
 }
@@ -73,16 +73,16 @@ function createDraft(payload) {
   align-items: center;
   border-radius: var(--radius-xl);
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: var(--space-4);
+  padding: var(--space-6);
 }
 
 .create-view__eyebrow {
   color: var(--primary);
-  font-size: 12px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
   letter-spacing: 0.04em;
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-1);
   text-transform: uppercase;
 }
 
@@ -93,7 +93,8 @@ function createDraft(payload) {
 }
 
 .create-view h1 {
-  font-size: 34px;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
   line-height: 1.08;
 }
 
@@ -103,7 +104,7 @@ function createDraft(payload) {
 
 .create-view__drafts {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .create-view__section-title {
@@ -114,43 +115,47 @@ function createDraft(payload) {
 
 .create-view__section-title span {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  font-weight: 800;
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-black);
   min-width: 32px;
-  padding: 6px 10px;
+  padding: 6px var(--space-2);
   text-align: center;
+}
+
+html.light .create-view__section-title span {
+  background: rgba(20, 20, 30, 0.06);
 }
 
 .create-view__empty,
 .create-view__draft {
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: var(--space-4);
 }
 
 .create-view__empty {
   align-items: center;
   color: var(--on-surface-muted);
   display: flex;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .create-view__draft {
   align-items: center;
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   justify-content: space-between;
 }
 
 .create-view__draft p {
   color: var(--on-surface-muted);
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 .create-view__draft button {
   align-items: center;
   background: rgba(255, 180, 171, 0.1);
   border: 1px solid rgba(255, 180, 171, 0.2);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   color: var(--error);
   cursor: pointer;
   display: inline-flex;
@@ -161,7 +166,7 @@ function createDraft(payload) {
 
 .form-pop-enter-active,
 .form-pop-leave-active {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity var(--duration-base) var(--ease-standard), transform var(--duration-base) var(--ease-standard);
 }
 
 .form-pop-enter-from,

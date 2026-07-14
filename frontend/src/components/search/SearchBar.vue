@@ -15,11 +15,11 @@ const model = defineModel({
 <style scoped>
 .search-bar {
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   display: flex;
-  gap: 10px;
+  gap: var(--space-2);
   min-height: 52px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
 }
 
 .search-bar input {

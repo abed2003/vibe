@@ -25,10 +25,10 @@ const uiStore = useUiStore();
 <style scoped>
 .alert-stack {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
   position: fixed;
-  right: 16px;
-  top: 16px;
+  right: var(--space-4);
+  top: var(--space-4);
   width: min(360px, calc(100vw - 32px));
   z-index: 200;
 }
@@ -38,8 +38,8 @@ const uiStore = useUiStore();
   color: var(--on-surface);
   cursor: pointer;
   display: flex;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3);
   text-align: left;
 }
 

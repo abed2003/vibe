@@ -1,5 +1,10 @@
+<script setup>
+import ThemeToggle from '../components/common/ThemeToggle.vue';
+</script>
+
 <template>
   <main class="auth-layout screen">
+    <ThemeToggle class="auth-layout__theme-toggle" />
     <section class="auth-layout__panel">
       <slot />
     </section>
@@ -12,19 +17,24 @@
   display: flex;
   justify-content: center;
   overflow: hidden;
-  padding: 24px 16px;
+  padding: var(--space-6) var(--space-4);
   position: relative;
 }
 
 .auth-layout::before,
 .auth-layout::after {
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   content: "";
   filter: blur(90px);
   height: 260px;
   opacity: 0.32;
   position: absolute;
   width: 260px;
+}
+
+html.light .auth-layout::before,
+html.light .auth-layout::after {
+  opacity: 0.16;
 }
 
 .auth-layout::before {
@@ -44,5 +54,12 @@
   position: relative;
   width: 100%;
   z-index: 1;
+}
+
+.auth-layout__theme-toggle {
+  position: absolute;
+  right: var(--space-4);
+  top: var(--space-4);
+  z-index: 2;
 }
 </style>

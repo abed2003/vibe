@@ -13,7 +13,7 @@ const uiStore = useUiStore();
 <style scoped>
 .loading-overlay {
   align-items: center;
-  background: rgba(10, 14, 20, 0.34);
+  background: var(--scrim-soft);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -25,8 +25,8 @@ const uiStore = useUiStore();
 .loading-overlay__spinner {
   animation: spin 700ms linear infinite;
   border: 3px solid rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
-  border-top-color: var(--primary);
+  border-radius: var(--radius-full);
+  border-top-color: var(--accent-vivid);
   height: 34px;
   width: 34px;
 }

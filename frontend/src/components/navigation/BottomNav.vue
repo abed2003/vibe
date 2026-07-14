@@ -32,7 +32,7 @@ const links = [
   left: 50%;
   max-width: 430px;
   min-height: 64px;
-  padding: 8px;
+  padding: var(--space-2);
   position: fixed;
   transform: translateX(-50%);
   width: min(calc(100% - 28px), 430px);
@@ -41,11 +41,11 @@ const links = [
 
 .bottom-nav__link {
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   color: var(--on-surface-muted);
   display: grid;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
   gap: 2px;
   justify-items: center;
   min-height: 48px;
@@ -57,13 +57,13 @@ const links = [
 }
 
 .bottom-nav__link.router-link-active .material-symbols-outlined {
-  animation: nav-pulse 900ms ease-out;
-  border-radius: 999px;
+  animation: nav-pulse var(--duration-decorative) ease-out;
+  border-radius: var(--radius-full);
 }
 
 .bottom-nav__link .material-symbols-outlined {
   font-size: 23px;
-  transition: transform 160ms ease;
+  transition: transform var(--duration-base) var(--ease-standard);
 }
 
 .bottom-nav__link:active .material-symbols-outlined {
@@ -71,14 +71,14 @@ const links = [
 }
 
 .bottom-nav__link--create {
-  color: #fefaff;
+  color: var(--on-vivid);
   position: relative;
   top: -10px;
 }
 
 .bottom-nav__link--create .material-symbols-outlined {
   background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   box-shadow: 0 10px 24px rgba(91, 94, 255, 0.4);
   font-size: 28px;
   padding: 10px;

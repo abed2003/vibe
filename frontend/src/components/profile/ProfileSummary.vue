@@ -35,17 +35,18 @@ defineProps({
 .profile-summary {
   border-radius: var(--radius-xl);
   display: grid;
-  gap: 18px;
-  padding: 24px;
+  gap: var(--space-4);
+  padding: var(--space-6);
 }
 
 .profile-summary__avatar {
   align-items: center;
   background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
-  border-radius: 999px;
+  border-radius: var(--radius-full);
+  color: var(--on-vivid);
   display: flex;
-  font-size: 36px;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
   height: 92px;
   justify-content: center;
   width: 92px;
@@ -57,12 +58,12 @@ defineProps({
 
 .profile-summary p {
   color: var(--on-surface-muted);
-  margin: 6px 0 0;
+  margin: var(--space-1) 0 0;
 }
 
 .profile-summary__stats {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2);
   grid-template-columns: repeat(3, 1fr);
   margin: 0;
 }
@@ -70,19 +71,23 @@ defineProps({
 .profile-summary__stats div {
   background: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: var(--space-3);
+}
+
+html.light .profile-summary__stats div {
+  background: rgba(20, 20, 30, 0.04);
 }
 
 .profile-summary dt {
   color: var(--on-surface-muted);
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 4px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
+  margin-bottom: var(--space-1);
 }
 
 .profile-summary dd {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-black);
   margin: 0;
 }
 </style>

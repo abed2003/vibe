@@ -35,12 +35,13 @@ const results = computed(() => {
 <style scoped>
 .search-view {
   display: grid;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .search-view h1 {
-  font-size: 34px;
-  margin: 0 0 8px;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  margin: 0 0 var(--space-2);
 }
 
 .search-view p {
@@ -49,7 +50,7 @@ const results = computed(() => {
 
 .search-view__results {
   display: grid;
-  gap: 14px;
+  gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 </style>

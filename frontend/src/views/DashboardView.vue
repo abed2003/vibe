@@ -14,17 +14,17 @@ const authStore = useAuthStore();
       </div>
       <div class="dashboard-view__grid">
         <article class="glass">
-          <span class="material-symbols-outlined">movie</span>
+          <span class="material-symbols-outlined dashboard-view__icon">movie</span>
           <strong>24</strong>
           <p>Published videos</p>
         </article>
         <article class="glass">
-          <span class="material-symbols-outlined">draft</span>
+          <span class="material-symbols-outlined dashboard-view__icon">draft</span>
           <strong>7</strong>
           <p>Drafts</p>
         </article>
         <article class="glass">
-          <span class="material-symbols-outlined">trending_up</span>
+          <span class="material-symbols-outlined dashboard-view__icon">trending_up</span>
           <strong>18%</strong>
           <p>Weekly growth</p>
         </article>
@@ -36,12 +36,13 @@ const authStore = useAuthStore();
 <style scoped>
 .dashboard-view {
   display: grid;
-  gap: 22px;
+  gap: var(--space-6);
 }
 
 .dashboard-view h1 {
-  font-size: 34px;
-  margin: 0 0 8px;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  margin: 0 0 var(--space-2);
 }
 
 .dashboard-view p {
@@ -50,18 +51,24 @@ const authStore = useAuthStore();
 
 .dashboard-view__grid {
   display: grid;
-  gap: 14px;
+  gap: var(--space-4);
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
 .dashboard-view article {
   border-radius: var(--radius-xl);
   display: grid;
-  gap: 8px;
-  padding: 22px;
+  gap: var(--space-2);
+  padding: var(--space-6);
 }
 
 .dashboard-view article strong {
-  font-size: 34px;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+}
+
+.dashboard-view__icon {
+  color: var(--primary-strong);
+  font-size: var(--text-xl);
 }
 </style>

@@ -38,7 +38,7 @@ const video = computed(() => sampleVideos.find((item) => item.id === route.param
 <style scoped>
 .video-details {
   display: grid;
-  gap: 18px;
+  gap: var(--space-4);
   margin: 0 auto;
   max-width: 980px;
 }
@@ -46,8 +46,8 @@ const video = computed(() => sampleVideos.find((item) => item.id === route.param
 .video-details__panel {
   border-radius: var(--radius-xl);
   display: grid;
-  gap: 12px;
-  padding: 22px;
+  gap: var(--space-3);
+  padding: var(--space-6);
 }
 
 .video-details__panel h1,
@@ -60,14 +60,18 @@ const video = computed(() => sampleVideos.find((item) => item.id === route.param
   color: var(--on-surface-muted);
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  font-weight: 800;
+  gap: var(--space-2);
+  font-weight: var(--weight-black);
 }
 
 .video-details article {
   background: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: var(--space-3);
+}
+
+html.light .video-details article {
+  background: rgba(20, 20, 30, 0.04);
 }
 
 @media (min-width: 860px) {

@@ -29,7 +29,7 @@ const activeCategory = ref('For You');
 }
 
 .home-view__tabs {
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   left: 50%;
   padding: 6px 10px;
   position: sticky;
@@ -41,8 +41,8 @@ const activeCategory = ref('For You');
 
 .home-view__feed {
   display: grid;
-  gap: 16px;
-  margin-top: 14px;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
   scroll-snap-type: y proximity;
 }
 

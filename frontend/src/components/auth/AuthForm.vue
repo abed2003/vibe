@@ -1,5 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
+import FormField from '../common/FormField.vue';
+import IconButton from '../common/IconButton.vue';
 
 const props = defineProps({
   mode: {
@@ -28,40 +30,48 @@ function submit() {
 
 <template>
   <form class="auth-form glass" @submit.prevent="submit">
-    <div v-if="props.mode === 'register'" class="field">
-      <label for="name">Display name</label>
-      <div class="input-wrap">
-        <span class="material-symbols-outlined">badge</span>
-        <input id="name" v-model.trim="form.name" type="text" required autocomplete="name" placeholder="Your name" />
-      </div>
-    </div>
+    <FormField
+      v-if="props.mode === 'register'"
+      id="name"
+      v-model="form.name"
+      label="Display name"
+      icon="badge"
+      required
+      autocomplete="name"
+      placeholder="Your name"
+    />
 
-    <div class="field">
-      <label for="email">Email address</label>
-      <div class="input-wrap">
-        <span class="material-symbols-outlined">mail</span>
-        <input id="email" v-model.trim="form.email" type="email" required autocomplete="email" placeholder="you@example.com" />
-      </div>
-    </div>
+    <FormField
+      id="email"
+      v-model="form.email"
+      label="Email address"
+      icon="mail"
+      type="email"
+      required
+      autocomplete="email"
+      placeholder="you@example.com"
+    />
 
-    <div class="field">
-      <label for="password">Password</label>
-      <div class="input-wrap">
-        <span class="material-symbols-outlined">lock</span>
-        <input
-          id="password"
-          v-model="form.password"
-          :type="showPassword ? 'text' : 'password'"
-          required
-          autocomplete="current-password"
-          placeholder="Enter your password"
-          minlength="8"
+    <FormField
+      id="password"
+      v-model="form.password"
+      label="Password"
+      icon="lock"
+      :type="showPassword ? 'text' : 'password'"
+      required
+      autocomplete="current-password"
+      placeholder="Enter your password"
+      minlength="8"
+    >
+      <template #trailing>
+        <IconButton
+          :icon="showPassword ? 'visibility_off' : 'visibility'"
+          :label="showPassword ? 'Hide password' : 'Show password'"
+          class="auth-form__visibility"
+          @click="showPassword = !showPassword"
         />
-        <button class="auth-form__icon" type="button" :aria-label="showPassword ? 'Hide password' : 'Show password'" @click="showPassword = !showPassword">
-          <span class="material-symbols-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
-        </button>
-      </div>
-    </div>
+      </template>
+    </FormField>
 
     <div v-if="props.mode === 'login'" class="auth-form__row">
       <label class="auth-form__remember">
@@ -81,25 +91,23 @@ function submit() {
 .auth-form {
   border-radius: var(--radius-xl);
   display: grid;
-  gap: 22px;
-  padding: 24px;
+  gap: var(--space-6);
+  padding: var(--space-6);
 }
 
-.auth-form__icon {
-  align-items: center;
+.auth-form__visibility {
   background: transparent;
   border: 0;
-  color: var(--on-surface-muted);
-  cursor: pointer;
-  display: inline-flex;
-  padding: 0;
+  height: 32px;
+  margin-right: calc(var(--space-2) * -1);
+  width: 32px;
 }
 
 .auth-form__row {
   align-items: center;
   display: flex;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
   justify-content: space-between;
 }
 
@@ -107,7 +115,7 @@ function submit() {
   align-items: center;
   color: var(--on-surface-muted);
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .auth-form__row a {

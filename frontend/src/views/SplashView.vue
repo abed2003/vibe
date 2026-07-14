@@ -30,7 +30,7 @@ onMounted(() => {
 .splash-view__pulse {
   animation: pulse 1s ease-in-out infinite;
   background: var(--primary);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   height: 10px;
   width: 10px;
 }

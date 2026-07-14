@@ -95,7 +95,7 @@ async function share(event) {
 <style scoped>
 .action-rail {
   display: grid;
-  gap: 18px;
+  gap: var(--space-5);
   position: absolute;
   right: 14px;
   top: 38%;
@@ -106,7 +106,8 @@ async function share(event) {
   align-items: center;
   background: transparent;
   border: 0;
-  color: white;
+  border-radius: var(--radius-full);
+  color: var(--on-vivid);
   cursor: pointer;
   display: grid;
   gap: 4px;
@@ -116,10 +117,10 @@ async function share(event) {
 
 .action-rail .material-symbols-outlined {
   background: rgba(0, 0, 0, 0.28);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 30px;
   padding: 9px;
-  transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+  transition: transform var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard), color var(--duration-base) var(--ease-standard);
 }
 
 .action-rail button:active .material-symbols-outlined {
@@ -127,17 +128,17 @@ async function share(event) {
 }
 
 .action-rail strong {
-  font-size: 12px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
 }
 
 .action-rail__like.is-active .material-symbols-outlined {
   background: rgba(255, 76, 106, 0.22);
-  color: #ff4c6a;
+  color: var(--like);
 }
 
 .action-rail__save.is-active .material-symbols-outlined {
   background: rgba(192, 193, 255, 0.24);
-  color: var(--primary);
+  color: var(--accent-vivid);
 }
 </style>

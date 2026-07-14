@@ -171,8 +171,8 @@ onBeforeUnmount(() => {
 
 .video-card__mute-hint {
   background: rgba(10, 14, 20, 0.55);
-  border-radius: 999px;
-  color: #fff;
+  border-radius: var(--radius-full);
+  color: var(--on-vivid);
   font-size: 34px;
   left: 50%;
   padding: 14px;
@@ -183,11 +183,11 @@ onBeforeUnmount(() => {
 }
 
 .mute-hint-enter-active {
-  transition: opacity 120ms ease, transform 120ms ease;
+  transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .mute-hint-leave-active {
-  transition: opacity 320ms ease;
+  transition: opacity var(--duration-slow) var(--ease-in);
 }
 
 .mute-hint-enter-from {
@@ -200,7 +200,7 @@ onBeforeUnmount(() => {
 }
 
 .video-card__gradient {
-  background: linear-gradient(to top, rgba(10, 14, 20, 0.9), rgba(10, 14, 20, 0.2) 55%, transparent);
+  background: linear-gradient(to top, var(--scrim-strong), var(--scrim-soft) 55%, transparent);
   inset: 0;
   position: absolute;
 }
@@ -208,9 +208,9 @@ onBeforeUnmount(() => {
 .video-card__meta {
   bottom: 0;
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
   left: 0;
-  padding: 22px 72px 24px 18px;
+  padding: var(--space-6) 72px var(--space-6) var(--space-4);
   position: absolute;
   right: 0;
   z-index: 2;
@@ -219,12 +219,12 @@ onBeforeUnmount(() => {
 .video-card__creator {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .video-card__creator img {
   border: 2px solid rgba(255, 255, 255, 0.72);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   height: 40px;
   position: static;
   width: 40px;
@@ -240,8 +240,8 @@ onBeforeUnmount(() => {
 }
 
 .video-card__meta h2 {
-  font-size: 22px;
-  line-height: 1.18;
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
   margin: 0;
 }
 
@@ -252,15 +252,16 @@ onBeforeUnmount(() => {
 .video-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .video-card__tags span {
-  background: rgba(210, 187, 255, 0.18);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
+  background: var(--tag-bg);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
   padding: 5px 9px;
+  color: var(--on-vivid);
 }
 
 .video-card--compact .video-card__meta {
