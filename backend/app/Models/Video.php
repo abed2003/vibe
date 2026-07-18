@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -20,6 +21,7 @@ class Video extends Model
         'title',
         'description',
         'visibility',
+        'tags',
     ];
 
     /**
@@ -41,6 +43,8 @@ class Video extends Model
         'height',
         'status',
         'views_count',
+        'likes_count',
+        'comments_count',
         'failure_reason',
         'published_at',
     ];
@@ -50,11 +54,14 @@ class Video extends Model
         return [
             'status' => VideoStatus::class,
             'visibility' => VideoVisibility::class,
+            'tags' => 'array',
             'size_bytes' => 'integer',
             'duration_seconds' => 'integer',
             'width' => 'integer',
             'height' => 'integer',
             'views_count' => 'integer',
+            'likes_count' => 'integer',
+            'comments_count' => 'integer',
             'published_at' => 'datetime',
         ];
     }
@@ -78,6 +85,21 @@ class Video extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function saves(): HasMany
+    {
+        return $this->hasMany(Save::class);
     }
 
     public function scopePubliclyVisible(Builder $query): Builder

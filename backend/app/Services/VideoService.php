@@ -43,6 +43,7 @@ class VideoService
             'user_id' => $user->id,
             'title' => $attributes['title'] ?? null,
             'description' => $attributes['description'] ?? null,
+            'tags' => $attributes['tags'] ?? null,
             'visibility' => $attributes['visibility'] ?? VideoVisibility::Public,
             'disk' => $disk,
             'path' => $path,

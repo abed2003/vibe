@@ -1,4 +1,10 @@
 <script setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const overlay = computed(() => route.name === 'home');
+
 const links = [
   { to: '/', icon: 'home', label: 'Home' },
   { to: '/explore', icon: 'explore', label: 'Explore' },
@@ -9,7 +15,7 @@ const links = [
 </script>
 
 <template>
-  <nav class="bottom-nav glass" aria-label="Mobile navigation">
+  <nav class="bottom-nav glass" :class="{ 'bottom-nav--overlay': overlay }" aria-label="Mobile navigation">
     <RouterLink
       v-for="link in links"
       :key="link.to"
@@ -90,5 +96,28 @@ const links = [
 
 .bottom-nav__link--create.router-link-active {
   background: transparent;
+}
+
+.bottom-nav--overlay {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: transparent;
+  border-color: transparent;
+  bottom: 0;
+  box-shadow: none;
+}
+
+.bottom-nav--overlay .bottom-nav__link {
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+}
+
+.bottom-nav--overlay .bottom-nav__link.router-link-active {
+  background: transparent;
+  color: var(--on-vivid);
+}
+
+.bottom-nav--overlay .bottom-nav__link--create {
+  color: var(--on-vivid);
 }
 </style>

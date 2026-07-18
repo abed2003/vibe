@@ -39,6 +39,10 @@ defineProps({
   maxlength: {
     type: [String, Number],
     default: undefined
+  },
+  error: {
+    type: String,
+    default: ''
   }
 });
 
@@ -46,7 +50,7 @@ defineEmits(['update:modelValue']);
 </script>
 
 <template>
-  <div class="field">
+  <div class="field" :class="{ 'field--invalid': error }">
     <label :for="id">{{ label }}</label>
     <div class="input-wrap">
       <span v-if="icon" class="material-symbols-outlined">{{ icon }}</span>
@@ -59,9 +63,17 @@ defineEmits(['update:modelValue']);
         :autocomplete="autocomplete"
         :minlength="minlength"
         :maxlength="maxlength"
+        :aria-invalid="Boolean(error)"
         @input="$emit('update:modelValue', $event.target.value)"
       />
       <slot name="trailing" />
     </div>
+    <p v-if="error" class="form-error">{{ error }}</p>
   </div>
 </template>
+
+<style scoped>
+.field--invalid .input-wrap {
+  border-color: var(--error);
+}
+</style>

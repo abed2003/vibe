@@ -1,12 +1,17 @@
 <script setup>
-import AppTopBar from '../components/navigation/AppTopBar.vue';
 import BottomNav from '../components/navigation/BottomNav.vue';
+
+defineProps({
+  immersive: {
+    type: Boolean,
+    default: false
+  }
+});
 </script>
 
 <template>
   <div class="app-layout">
-    <AppTopBar />
-    <main class="page-shell">
+    <main class="page-shell" :class="{ 'page-shell--immersive': immersive }">
       <slot />
     </main>
     <BottomNav />

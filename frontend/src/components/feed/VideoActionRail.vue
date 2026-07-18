@@ -1,7 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useUiStore } from '../../store/ui';
+import { useFeedStore } from '../../store/feed';
+import { useAuthStore } from '../../store/auth';
+import { formatCount } from '../../services/videos';
 
 const props = defineProps({
   video: {
@@ -10,42 +13,60 @@ const props = defineProps({
   }
 });
 
+const route = useRoute();
 const router = useRouter();
 const uiStore = useUiStore();
+const feedStore = useFeedStore();
+const authStore = useAuthStore();
 
-const liked = ref(false);
-const saved = ref(false);
+const engagement = computed(() => feedStore.stateFor(props.video));
+const isOwnVideo = computed(() => authStore.user?.id && authStore.user.id === props.video.creatorId);
 
-const likeCount = computed(() => bump(props.video.likes, liked.value));
+const likePending = computed(() => Boolean(feedStore.pending[`like:${props.video.id}`]));
+const savePending = computed(() => Boolean(feedStore.pending[`save:${props.video.id}`]));
+const followPending = computed(() => Boolean(feedStore.pending[`follow:${props.video.creatorId}`]));
 
-function bump(value, active) {
-  if (!active) return value;
-  const match = /^([\d.]+)([A-Za-z]*)$/.exec(String(value).trim());
-  if (!match) return value;
-  const [, num, suffix] = match;
-  return `${(Number(num) + (suffix ? 0.1 : 1)).toFixed(suffix ? 1 : 0)}${suffix}`;
+/** Social actions require an account; guests are routed to login. */
+function requireAuth() {
+  if (authStore.isAuthenticated) return true;
+  router.push({ name: 'login', query: { redirect: route.fullPath } });
+  return false;
 }
 
 function toggleLike(event) {
   event.preventDefault();
   event.stopPropagation();
-  liked.value = !liked.value;
+  if (requireAuth()) feedStore.toggleLike(props.video);
 }
 
-function toggleSave(event) {
+async function toggleFollow(event) {
   event.preventDefault();
   event.stopPropagation();
-  saved.value = !saved.value;
+  if (!requireAuth()) return;
+
+  const following = await feedStore.toggleFollow(props.video);
   uiStore.notify({
     type: 'success',
-    message: saved.value ? 'Saved to your collection.' : 'Removed from your collection.'
+    message: following ? `Following ${props.video.handle}` : `Unfollowed ${props.video.handle}`
+  });
+}
+
+async function toggleSave(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!requireAuth()) return;
+
+  const saved = await feedStore.toggleSave(props.video);
+  uiStore.notify({
+    type: 'success',
+    message: saved ? 'Saved to your collection.' : 'Removed from your collection.'
   });
 }
 
 function openComments(event) {
   event.preventDefault();
   event.stopPropagation();
-  router.push({ name: 'video-details', params: { id: props.video.id }, hash: '#comments' });
+  feedStore.openComments(props.video.id);
 }
 
 async function share(event) {
@@ -74,20 +95,47 @@ async function share(event) {
 
 <template>
   <aside class="action-rail" aria-label="Video actions">
-    <button type="button" class="action-rail__like" :class="{ 'is-active': liked }" @click="toggleLike">
-      <span class="material-symbols-outlined">{{ liked ? 'favorite' : 'favorite_border' }}</span>
-      <strong>{{ likeCount }}</strong>
+    <div class="action-rail__creator">
+      <img v-if="video.avatar" :src="video.avatar" :alt="video.creator" />
+      <span v-else class="action-rail__initial">{{ video.creator.charAt(0) }}</span>
+      <button
+        v-if="!isOwnVideo"
+        type="button"
+        class="action-rail__follow"
+        :class="{ 'is-active': engagement.following }"
+        :disabled="followPending"
+        :aria-label="engagement.following ? `Following ${video.handle}` : `Follow ${video.handle}`"
+        @click="toggleFollow"
+      >
+        <span class="material-symbols-outlined">{{ engagement.following ? 'check' : 'add' }}</span>
+      </button>
+    </div>
+    <button
+      type="button"
+      class="action-rail__like"
+      :class="{ 'is-active': engagement.liked }"
+      :disabled="likePending"
+      @click="toggleLike"
+    >
+      <span class="material-symbols-outlined">favorite</span>
+      <strong>{{ formatCount(engagement.likesCount) }}</strong>
     </button>
     <button type="button" @click="openComments">
       <span class="material-symbols-outlined">mode_comment</span>
-      <strong>{{ video.comments }}</strong>
+      <strong>{{ formatCount(engagement.commentsCount) }}</strong>
     </button>
     <button type="button" @click="share">
       <span class="material-symbols-outlined">ios_share</span>
-      <strong>{{ video.shares }}</strong>
+      <strong>{{ formatCount(video.views) }}</strong>
     </button>
-    <button type="button" class="action-rail__save" :class="{ 'is-active': saved }" @click="toggleSave">
-      <span class="material-symbols-outlined">{{ saved ? 'bookmark' : 'bookmark_border' }}</span>
+    <button
+      type="button"
+      class="action-rail__save"
+      :class="{ 'is-active': engagement.saved }"
+      :disabled="savePending"
+      @click="toggleSave"
+    >
+      <span class="material-symbols-outlined">{{ engagement.saved ? 'bookmark' : 'bookmark_border' }}</span>
     </button>
   </aside>
 </template>
@@ -98,7 +146,7 @@ async function share(event) {
   gap: var(--space-5);
   position: absolute;
   right: 14px;
-  top: 38%;
+  top: 34%;
   z-index: 3;
 }
 
@@ -113,6 +161,65 @@ async function share(event) {
   gap: 4px;
   justify-items: center;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.action-rail button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.action-rail__creator {
+  margin-bottom: var(--space-2);
+  position: relative;
+}
+
+.action-rail__creator img,
+.action-rail__initial {
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-full);
+  height: 48px;
+  width: 48px;
+}
+
+.action-rail__initial {
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary-strong), var(--secondary-strong));
+  display: flex;
+  font-weight: var(--weight-black);
+  justify-content: center;
+}
+
+.action-rail__follow {
+  background: var(--like);
+  border-radius: var(--radius-full);
+  bottom: -9px;
+  display: grid;
+  height: 22px;
+  left: 50%;
+  padding: 0;
+  place-items: center;
+  position: absolute;
+  transform: translateX(-50%);
+  transition: background var(--duration-base) var(--ease-standard), transform var(--duration-base) var(--ease-standard);
+  width: 22px;
+}
+
+.action-rail__follow .material-symbols-outlined {
+  font-size: 16px;
+  font-variation-settings: 'wght' 600;
+}
+
+.action-rail__follow.is-active {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.action-rail__follow.is-active .material-symbols-outlined {
+  color: var(--like);
+  text-shadow: none;
+}
+
+.action-rail__follow:active {
+  transform: translateX(-50%) scale(0.85);
 }
 
 .action-rail .material-symbols-outlined {
@@ -133,8 +240,22 @@ async function share(event) {
 }
 
 .action-rail__like.is-active .material-symbols-outlined {
+  animation: like-pop 0.35s var(--ease-out);
   background: rgba(255, 76, 106, 0.22);
   color: var(--like);
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .action-rail__save.is-active .material-symbols-outlined {

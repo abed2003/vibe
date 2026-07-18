@@ -12,6 +12,10 @@ const props = defineProps({
   submitting: {
     type: Boolean,
     default: false
+  },
+  errors: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -20,7 +24,8 @@ const showPassword = ref(false);
 const form = reactive({
   name: '',
   email: '',
-  password: ''
+  password: '',
+  password_confirmation: ''
 });
 
 function submit() {
@@ -29,7 +34,7 @@ function submit() {
 </script>
 
 <template>
-  <form class="auth-form glass" @submit.prevent="submit">
+  <form class="auth-form glass" novalidate @submit.prevent="submit">
     <FormField
       v-if="props.mode === 'register'"
       id="name"
@@ -39,6 +44,7 @@ function submit() {
       required
       autocomplete="name"
       placeholder="Your name"
+      :error="errors.name?.[0]"
     />
 
     <FormField
@@ -50,6 +56,7 @@ function submit() {
       required
       autocomplete="email"
       placeholder="you@example.com"
+      :error="errors.email?.[0]"
     />
 
     <FormField
@@ -59,9 +66,10 @@ function submit() {
       icon="lock"
       :type="showPassword ? 'text' : 'password'"
       required
-      autocomplete="current-password"
+      :autocomplete="props.mode === 'login' ? 'current-password' : 'new-password'"
       placeholder="Enter your password"
       minlength="8"
+      :error="errors.password?.[0]"
     >
       <template #trailing>
         <IconButton
@@ -73,6 +81,20 @@ function submit() {
       </template>
     </FormField>
 
+    <FormField
+      v-if="props.mode === 'register'"
+      id="password_confirmation"
+      v-model="form.password_confirmation"
+      label="Confirm password"
+      icon="lock"
+      :type="showPassword ? 'text' : 'password'"
+      required
+      autocomplete="new-password"
+      placeholder="Repeat your password"
+      minlength="8"
+      :error="errors.password_confirmation?.[0]"
+    />
+
     <div v-if="props.mode === 'login'" class="auth-form__row">
       <label class="auth-form__remember">
         <input type="checkbox" />
@@ -82,7 +104,7 @@ function submit() {
     </div>
 
     <button class="app-button primary auth-form__submit" type="submit" :disabled="props.submitting">
-      {{ props.mode === 'login' ? 'Login to VIBE' : 'Create account' }}
+      {{ props.submitting ? 'Please wait…' : props.mode === 'login' ? 'Login to VIBE' : 'Create account' }}
     </button>
   </form>
 </template>

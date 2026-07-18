@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { loginRequest, registerRequest, fetchCurrentUser } from '../services/auth';
+import { loginRequest, registerRequest, fetchCurrentUser, logoutRequest } from '../services/auth';
 
 const STORAGE_KEY = 'tikvibe.auth';
 
@@ -62,7 +62,22 @@ export const useAuthStore = defineStore('auth', {
         this.initialized = true;
       }
     },
-    logout() {
+    async refreshUser() {
+      if (!this.token) return;
+      this.user = await fetchCurrentUser();
+      this.persist();
+    },
+    async logout({ remote = true } = {}) {
+      if (remote && this.token) {
+        // Best effort: the session is cleared locally regardless of whether
+        // the server-side token revocation succeeds.
+        try {
+          await logoutRequest();
+        } catch {
+          /* token may already be invalid — local logout proceeds anyway */
+        }
+      }
+
       this.token = null;
       this.user = null;
       this.initialized = true;

@@ -9,12 +9,19 @@ import { useAuthStore } from '../store/auth';
 const router = useRouter();
 const authStore = useAuthStore();
 const submitting = ref(false);
+const errors = ref({});
 
 async function register(payload) {
   submitting.value = true;
+  errors.value = {};
+
   try {
     await authStore.register(payload);
     await router.push({ name: 'dashboard' });
+  } catch (error) {
+    if (error.validationErrors) {
+      errors.value = error.validationErrors;
+    }
   } finally {
     submitting.value = false;
   }
@@ -27,7 +34,7 @@ async function register(payload) {
       <BrandLogo />
       <p>Start posting, saving, and finding your people.</p>
     </div>
-    <AuthForm mode="register" :submitting="submitting" @submit="register" />
+    <AuthForm mode="register" :submitting="submitting" :errors="errors" @submit="register" />
     <p class="auth-footnote">
       Already have an account?
       <RouterLink to="/login">Login</RouterLink>

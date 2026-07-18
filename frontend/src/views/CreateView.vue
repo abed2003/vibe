@@ -1,27 +1,63 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppLayout from '../layouts/AppLayout.vue';
 import UploadVideoForm from '../components/video/UploadVideoForm.vue';
 import { useUiStore } from '../store/ui';
+import { useAuthStore } from '../store/auth';
 import { useVideosStore } from '../store/videos';
+import { fetchUserVideos } from '../services/users';
+import { deleteVideo, timeAgo, formatCount } from '../services/videos';
 
 const isFormOpen = ref(false);
 const uiStore = useUiStore();
+const authStore = useAuthStore();
 const videosStore = useVideosStore();
 
-function createDraft(payload) {
-  const draft = videosStore.createDraft(payload);
+const uploads = ref([]);
+const loadingUploads = ref(true);
+const deletingId = ref(null);
+
+async function loadUploads() {
+  loadingUploads.value = true;
+
+  try {
+    const page = await fetchUserVideos(authStore.user.id);
+    uploads.value = page.videos;
+  } finally {
+    loadingUploads.value = false;
+  }
+}
+
+function onUploaded(video) {
   isFormOpen.value = false;
   uiStore.notify({
     type: 'success',
-    message: `${draft.title} was created as a video draft.`
+    message: `“${video.title}” uploaded — it appears in the feed as soon as processing finishes.`
   });
+  loadUploads();
 }
+
+async function remove(video) {
+  if (deletingId.value) return;
+  if (!window.confirm(`Delete “${video.title}”? This cannot be undone.`)) return;
+
+  deletingId.value = video.id;
+
+  try {
+    await deleteVideo(video.id);
+    uploads.value = uploads.value.filter((item) => item.id !== video.id);
+    uiStore.notify({ type: 'success', message: 'Video deleted.' });
+  } finally {
+    deletingId.value = null;
+  }
+}
+
+onMounted(loadUploads);
 </script>
 
 <template>
   <AppLayout>
-    <section class="create-view">
+    <section class="page-stack create-view">
       <div class="create-view__hero glass">
         <div>
           <p class="create-view__eyebrow">Creator Studio</p>
@@ -35,16 +71,40 @@ function createDraft(payload) {
       </div>
 
       <Transition name="form-pop">
-        <UploadVideoForm v-if="isFormOpen" @cancel="isFormOpen = false" @submit="createDraft" />
+        <UploadVideoForm v-if="isFormOpen" @cancel="isFormOpen = false" @uploaded="onUploaded" />
       </Transition>
 
       <section class="create-view__drafts">
-        <div class="create-view__section-title">
-          <h2>Drafts</h2>
-          <span>{{ videosStore.drafts.length }}</span>
+        <div class="section-title">
+          <h2>My uploads</h2>
+          <span class="count-pill">{{ uploads.length }}</span>
         </div>
-        <article v-if="!videosStore.drafts.length" class="create-view__empty glass">
+        <p v-if="loadingUploads" class="muted">Loading your uploads…</p>
+        <article v-else-if="!uploads.length" class="empty-card glass">
           <span class="material-symbols-outlined">video_library</span>
+          <p>No uploads yet. Publish your first video above.</p>
+        </article>
+        <article v-for="video in uploads" v-else :key="video.id" class="create-view__draft glass">
+          <div>
+            <strong>{{ video.title }}</strong>
+            <p>
+              <span class="status-chip" :data-status="video.status">{{ video.status }}</span>
+              · {{ video.visibility }} · {{ formatCount(video.views) }} views · {{ timeAgo(video.publishedAt || '') || 'just now' }}
+            </p>
+          </div>
+          <button type="button" aria-label="Delete video" :disabled="deletingId === video.id" @click="remove(video)">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </article>
+      </section>
+
+      <section class="create-view__drafts">
+        <div class="section-title">
+          <h2>Drafts</h2>
+          <span class="count-pill">{{ videosStore.drafts.length }}</span>
+        </div>
+        <article v-if="!videosStore.drafts.length" class="empty-card glass">
+          <span class="material-symbols-outlined">draft</span>
           <p>No video drafts yet.</p>
         </article>
         <article v-for="draft in videosStore.drafts" :key="draft.id" class="create-view__draft glass">
@@ -107,39 +167,9 @@ function createDraft(payload) {
   gap: var(--space-2);
 }
 
-.create-view__section-title {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-}
-
-.create-view__section-title span {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  font-weight: var(--weight-black);
-  min-width: 32px;
-  padding: 6px var(--space-2);
-  text-align: center;
-}
-
-html.light .create-view__section-title span {
-  background: rgba(20, 20, 30, 0.06);
-}
-
-.create-view__empty,
 .create-view__draft {
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-}
-
-.create-view__empty {
-  align-items: center;
-  color: var(--on-surface-muted);
-  display: flex;
-  gap: var(--space-2);
-}
-
-.create-view__draft {
   align-items: center;
   display: flex;
   gap: var(--space-3);
@@ -159,9 +189,15 @@ html.light .create-view__section-title span {
   color: var(--error);
   cursor: pointer;
   display: inline-flex;
+  flex: none;
   height: 40px;
   justify-content: center;
   width: 40px;
+}
+
+.create-view__draft button:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .form-pop-enter-active,

@@ -10,12 +10,21 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const submitting = ref(false);
+const errors = ref({});
 
 async function login(payload) {
   submitting.value = true;
+  errors.value = {};
+
   try {
     await authStore.login(payload);
     await router.push(route.query.redirect || { name: 'dashboard' });
+  } catch (error) {
+    // 422 (invalid credentials / validation) renders beside the fields;
+    // other failures were already toasted by the API interceptor.
+    if (error.validationErrors) {
+      errors.value = error.validationErrors;
+    }
   } finally {
     submitting.value = false;
   }
@@ -28,7 +37,7 @@ async function login(payload) {
       <BrandLogo />
       <p>Welcome back to the vibe.</p>
     </div>
-    <AuthForm mode="login" :submitting="submitting" @submit="login" />
+    <AuthForm mode="login" :submitting="submitting" :errors="errors" @submit="login" />
     <p class="auth-footnote">
       Do not have an account?
       <RouterLink to="/register">Sign up</RouterLink>

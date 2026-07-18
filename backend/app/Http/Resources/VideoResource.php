@@ -6,6 +6,7 @@ use App\Enums\VideoStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @mixin \App\Models\Video
@@ -25,6 +26,7 @@ class VideoResource extends JsonResource
             'uuid' => $this->uuid,
             'title' => $this->title,
             'description' => $this->description,
+            'tags' => $this->tags ?? [],
             'status' => $this->status->value,
             'visibility' => $this->visibility->value,
             'url' => $isReady ? Storage::disk($this->disk)->url($this->path) : null,
@@ -35,6 +37,12 @@ class VideoResource extends JsonResource
             'width' => $this->width,
             'height' => $this->height,
             'views_count' => $this->views_count,
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
+            // Set via withExists() on the listing/show queries when a viewer is
+            // authenticated; both default to false for guests.
+            'liked_by_me' => (bool) ($this->liked_by_me ?? false),
+            'saved_by_me' => (bool) ($this->saved_by_me ?? false),
             'published_at' => $this->published_at?->toIso8601String(),
             'created_at' => $this->created_at->toIso8601String(),
             // Only present when the caller eager-loaded `user`; omitted (not
@@ -42,6 +50,11 @@ class VideoResource extends JsonResource
             'owner' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'handle' => '@'.Str::of($this->user->email)->before('@')->lower(),
+                'avatar_url' => $this->user->avatar_url,
+                'is_followed_by_me' => $request->user()
+                    ? $this->user->isFollowedBy($request->user())
+                    : false,
             ]),
         ];
     }

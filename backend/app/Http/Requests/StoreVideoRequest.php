@@ -32,6 +32,8 @@ class StoreVideoRequest extends FormRequest
             ],
             'title' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'tags' => ['nullable', 'array', 'max:10'],
+            'tags.*' => ['string', 'max:32'],
             'visibility' => ['nullable', Rule::enum(VideoVisibility::class)],
         ];
     }

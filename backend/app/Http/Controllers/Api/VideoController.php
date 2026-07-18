@@ -34,12 +34,30 @@ class VideoController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $search = trim((string) $request->query('search', ''));
+        $viewer = $request->user();
+
         $query = fn () => Video::publiclyVisible()
             ->with('user')
+            ->when($viewer, fn ($q) => $q->withExists([
+                'likes as liked_by_me' => fn ($lq) => $lq->where('user_id', $viewer->id),
+                'saves as saved_by_me' => fn ($sq) => $sq->where('user_id', $viewer->id),
+            ]))
+            // Case-insensitive substring match on title/description; LOWER()
+            // keeps this portable across Postgres/MySQL/SQLite (unlike ILIKE).
+            ->when($search !== '', function ($q) use ($search) {
+                $term = '%'.mb_strtolower($search).'%';
+
+                return $q->where(fn ($sq) => $sq
+                    ->whereRaw('LOWER(title) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$term]));
+            })
             ->latest('published_at')
             ->cursorPaginate(15);
 
-        $paginator = $request->has('cursor')
+        // Only the no-cursor, unfiltered first page is cached (see the class
+        // docblock): search results and later pages read straight through.
+        $paginator = ($request->has('cursor') || $search !== '')
             ? $query()
             : Cache::remember(config('videos.feed_cache_key'), config('videos.feed_cache_ttl_seconds'), $query);
 
@@ -64,6 +82,14 @@ class VideoController extends Controller
         $this->authorize('view', $video);
 
         $viewer = $request->user();
+
+        if ($viewer) {
+            $video->loadExists([
+                'likes as liked_by_me' => fn ($lq) => $lq->where('user_id', $viewer->id),
+                'saves as saved_by_me' => fn ($sq) => $sq->where('user_id', $viewer->id),
+            ]);
+        }
+
         $fingerprint = $viewer
             ? (string) $viewer->id
             : hash('sha256', $request->ip().'|'.$request->userAgent());

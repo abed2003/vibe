@@ -1,50 +1,61 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppLayout from '../layouts/AppLayout.vue';
 import SearchBar from '../components/search/SearchBar.vue';
 import CategoryChips from '../components/search/CategoryChips.vue';
 import VideoCard from '../components/feed/VideoCard.vue';
-import { categories, sampleVideos } from '../services/feed';
+import StateBlock from '../components/common/StateBlock.vue';
+import { fetchFeed } from '../services/videos';
+import { useFeedStore } from '../store/feed';
+
+const categories = ['For You', 'Animation', 'Nature', 'Underwater', 'Film', 'Blender'];
+
+const feedStore = useFeedStore();
 
 const query = ref('');
 const activeCategory = ref('For You');
+const videos = ref([]);
+const loading = ref(true);
+
+async function load(search = '') {
+  loading.value = true;
+
+  try {
+    const page = await fetchFeed({ search });
+    videos.value = page.videos;
+    feedStore.hydrateAll(page.videos);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function selectCategory(category) {
+  activeCategory.value = category;
+  load(category === 'For You' ? '' : category);
+}
+
+function submitSearch() {
+  activeCategory.value = 'For You';
+  load(query.value.trim());
+}
+
+onMounted(() => load());
 </script>
 
 <template>
   <AppLayout>
-    <section class="explore-view">
-      <div>
+    <section class="page-stack">
+      <div class="page-header">
         <h1>Explore</h1>
-        <p class="muted">Fresh videos, creators, and trends built from the raw explore screen.</p>
+        <p class="muted">Fresh videos, creators, and trends from the community.</p>
       </div>
-      <SearchBar v-model="query" />
-      <CategoryChips v-model:active="activeCategory" :categories="categories" />
-      <div class="video-grid">
-        <VideoCard v-for="video in sampleVideos" :key="video.id" :video="video" compact />
+      <SearchBar v-model="query" @keyup.enter="submitSearch" />
+      <CategoryChips :active="activeCategory" :categories="categories" @update:active="selectCategory" />
+      <StateBlock v-if="loading" loading compact message="Loading videos…" />
+      <StateBlock v-else-if="!videos.length" compact icon="movie" message="Nothing here yet — try another category." />
+      <div v-else class="video-grid">
+        <VideoCard v-for="video in videos" :key="video.id" :video="video" compact />
       </div>
     </section>
   </AppLayout>
 </template>
-
-<style scoped>
-.explore-view {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.explore-view h1 {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-black);
-  margin: 0 0 var(--space-2);
-}
-
-.explore-view p {
-  margin: 0;
-}
-
-.video-grid {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-</style>

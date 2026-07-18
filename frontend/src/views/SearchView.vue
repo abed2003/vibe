@@ -1,56 +1,74 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import AppLayout from '../layouts/AppLayout.vue';
 import SearchBar from '../components/search/SearchBar.vue';
 import VideoCard from '../components/feed/VideoCard.vue';
-import { sampleVideos } from '../services/feed';
+import StateBlock from '../components/common/StateBlock.vue';
+import { fetchFeed } from '../services/videos';
+import { useFeedStore } from '../store/feed';
+
+const feedStore = useFeedStore();
 
 const query = ref('');
-const results = computed(() => {
-  const term = query.value.trim().toLowerCase();
+const results = ref([]);
+const loading = ref(true);
+const searched = ref(false);
 
-  if (!term) return sampleVideos;
+async function search(term) {
+  loading.value = true;
 
-  return sampleVideos.filter((video) => {
-    return [video.title, video.creator, video.caption, ...video.tags].some((value) => value.toLowerCase().includes(term));
-  });
+  try {
+    const page = await fetchFeed({ search: term });
+    results.value = page.videos;
+    feedStore.hydrateAll(page.videos);
+    searched.value = Boolean(term);
+  } finally {
+    loading.value = false;
+  }
+}
+
+let debounceTimer = null;
+
+watch(query, (value) => {
+  if (debounceTimer) window.clearTimeout(debounceTimer);
+  debounceTimer = window.setTimeout(() => search(value.trim()), 350);
+});
+
+onMounted(() => search(''));
+onBeforeUnmount(() => {
+  if (debounceTimer) window.clearTimeout(debounceTimer);
 });
 </script>
 
 <template>
   <AppLayout>
-    <section class="search-view">
-      <div>
+    <section class="page-stack">
+      <div class="page-header">
         <h1>Search</h1>
         <p class="muted">Find videos, creators, captions, and tags.</p>
       </div>
       <SearchBar v-model="query" />
-      <div class="search-view__results">
-        <VideoCard v-for="video in results" :key="video.id" :video="video" compact />
-      </div>
+      <StateBlock v-if="loading" loading compact message="Searching…" />
+      <StateBlock
+        v-else-if="searched && !results.length"
+        compact
+        icon="search_off"
+        :message="`No results for “${query.trim()}”. Try another title, caption, or tag.`"
+      />
+      <template v-else>
+        <p v-if="searched" class="muted search-view__count">
+          {{ results.length }} result{{ results.length === 1 ? '' : 's' }}
+        </p>
+        <div class="video-grid">
+          <VideoCard v-for="video in results" :key="video.id" :video="video" compact />
+        </div>
+      </template>
     </section>
   </AppLayout>
 </template>
 
 <style scoped>
-.search-view {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.search-view h1 {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-black);
-  margin: 0 0 var(--space-2);
-}
-
-.search-view p {
+.search-view__count {
   margin: 0;
-}
-
-.search-view__results {
-  display: grid;
-  gap: var(--space-4);
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 </style>
